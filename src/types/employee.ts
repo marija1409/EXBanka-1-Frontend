@@ -13,6 +13,7 @@ export interface Employee {
   active: boolean
   role: string
   permissions: string[]
+  jmbg?: string
 }
 
 export interface EmployeeListResponse {
@@ -41,6 +42,7 @@ export interface CreateEmployeeRequest {
   department?: string
   role: string
   active?: boolean
+  jmbg?: string
 }
 
 export interface UpdateEmployeeRequest {
@@ -52,4 +54,5 @@ export interface UpdateEmployeeRequest {
   department?: string
   role?: string
   active?: boolean
+  jmbg?: string
 }

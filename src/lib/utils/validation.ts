@@ -51,27 +51,45 @@ const EMPLOYEE_ROLES = [
 ] as const
 
 export const createEmployeeSchema = z.object({
-  first_name: z.string().min(1, 'First name is required'),
-  last_name: z.string().min(1, 'Last name is required'),
+  first_name: z
+    .string()
+    .min(1, 'First name is required')
+    .max(20, 'First name must be at most 20 characters'),
+  last_name: z
+    .string()
+    .min(1, 'Last name is required')
+    .max(20, 'Last name must be at most 20 characters'),
   date_of_birth: z.number(),
   gender: z.string().optional(),
   email: emailSchema,
-  phone: z.string().optional(),
+  phone: z.string().max(15, 'Phone number must be at most 15 digits').optional(),
   address: z.string().optional(),
   username: z.string().min(1, 'Username is required'),
   position: z.string().optional(),
   department: z.string().optional(),
   role: z.enum(EMPLOYEE_ROLES, { message: 'Role is required' }),
   active: z.boolean().optional().default(true),
+  jmbg: z
+    .string()
+    .regex(/^\d{13}$/, 'JMBG must be exactly 13 digits')
+    .optional(),
 })
 
 export const updateEmployeeSchema = z.object({
-  last_name: z.string().min(1, 'Last name is required').optional(),
+  last_name: z
+    .string()
+    .min(1, 'Last name is required')
+    .max(20, 'Last name must be at most 20 characters')
+    .optional(),
   gender: z.string().optional(),
-  phone: z.string().optional(),
+  phone: z.string().max(15, 'Phone number must be at most 15 digits').optional(),
   address: z.string().optional(),
   position: z.string().optional(),
   department: z.string().optional(),
   role: z.enum(EMPLOYEE_ROLES).optional(),
   active: z.boolean().optional(),
+  jmbg: z
+    .string()
+    .regex(/^\d{13}$/, 'JMBG must be exactly 13 digits')
+    .optional(),
 })

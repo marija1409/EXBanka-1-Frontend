@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -16,20 +17,59 @@ import type { Employee, CreateEmployeeRequest, UpdateEmployeeRequest } from '@/t
 
 const ROLES = ['EmployeeBasic', 'EmployeeAgent', 'EmployeeSupervisor', 'EmployeeAdmin'] as const
 
+const COUNTRY_CODES = [
+  { code: '+381', flag: '🇷🇸', iso: 'SRB' },
+  { code: '+1', flag: '🇺🇸', iso: 'USA' },
+  { code: '+44', flag: '🇬🇧', iso: 'GBR' },
+  { code: '+49', flag: '🇩🇪', iso: 'DEU' },
+  { code: '+33', flag: '🇫🇷', iso: 'FRA' },
+  { code: '+39', flag: '🇮🇹', iso: 'ITA' },
+  { code: '+43', flag: '🇦🇹', iso: 'AUT' },
+  { code: '+385', flag: '🇭🇷', iso: 'HRV' },
+  { code: '+387', flag: '🇧🇦', iso: 'BIH' },
+  { code: '+382', flag: '🇲🇪', iso: 'MNE' },
+  { code: '+389', flag: '🇲🇰', iso: 'MKD' },
+  { code: '+36', flag: '🇭🇺', iso: 'HUN' },
+  { code: '+48', flag: '🇵🇱', iso: 'POL' },
+  { code: '+40', flag: '🇷🇴', iso: 'ROU' },
+  { code: '+30', flag: '🇬🇷', iso: 'GRC' },
+  { code: '+90', flag: '🇹🇷', iso: 'TUR' },
+  { code: '+7', flag: '🇷🇺', iso: 'RUS' },
+  { code: '+86', flag: '🇨🇳', iso: 'CHN' },
+  { code: '+91', flag: '🇮🇳', iso: 'IND' },
+  { code: '+55', flag: '🇧🇷', iso: 'BRA' },
+  { code: '+52', flag: '🇲🇽', iso: 'MEX' },
+  { code: '+61', flag: '🇦🇺', iso: 'AUS' },
+  { code: '+81', flag: '🇯🇵', iso: 'JPN' },
+  { code: '+82', flag: '🇰🇷', iso: 'KOR' },
+  { code: '+27', flag: '🇿🇦', iso: 'ZAF' },
+  { code: '+20', flag: '🇪🇬', iso: 'EGY' },
+  { code: '+966', flag: '🇸🇦', iso: 'SAU' },
+  { code: '+971', flag: '🇦🇪', iso: 'ARE' },
+  { code: '+1', flag: '🇨🇦', iso: 'CAN' },
+  { code: '+54', flag: '🇦🇷', iso: 'ARG' },
+] as const
+
 interface EmployeeFormProps {
   onSubmit: (data: CreateEmployeeRequest | UpdateEmployeeRequest) => void
   isLoading: boolean
   employee?: Employee
 }
 
-// Create form schema — override date_of_birth to accept string from date input
+// Create form schema
 const createFormSchema = z.object({
-  first_name: z.string().min(1, 'First name is required'),
-  last_name: z.string().min(1, 'Last name is required'),
+  first_name: z
+    .string()
+    .min(1, 'First name is required')
+    .max(20, 'First name must be at most 20 characters'),
+  last_name: z
+    .string()
+    .min(1, 'Last name is required')
+    .max(20, 'Last name must be at most 20 characters'),
   date_of_birth: z.string().optional(),
   gender: z.string().optional(),
   email: z.string().email('Invalid email address'),
-  phone: z.string().optional(),
+  phone: z.string().max(15, 'Phone number must be at most 15 digits').optional(),
   address: z.string().optional(),
   username: z.string().min(1, 'Username is required'),
   position: z.string().optional(),
@@ -40,10 +80,79 @@ const createFormSchema = z.object({
     })
     .optional(),
   active: z.boolean().optional(),
+  jmbg: z
+    .string()
+    .regex(/^\d{13}$/, 'JMBG must be exactly 13 digits')
+    .optional()
+    .or(z.literal('')),
 })
 
 type CreateFormData = z.infer<typeof createFormSchema>
 type EditFormData = z.infer<typeof updateEmployeeSchema>
+
+function PhoneInput({ value, onChange }: { value: string; onChange: (val: string) => void }) {
+  const parsePhone = (full: string) => {
+    for (const cc of COUNTRY_CODES) {
+      if (full.startsWith(cc.code)) {
+        return { countryCode: cc.code, number: full.slice(cc.code.length) }
+      }
+    }
+    return { countryCode: '+381', number: full }
+  }
+
+  const parsed = parsePhone(value)
+  const [countryCode, setCountryCode] = useState(parsed.countryCode)
+  const [number, setNumber] = useState(parsed.number)
+
+  const handleCountryChange = (code: string | null) => {
+    if (!code) return
+    setCountryCode(code)
+    onChange(code + number)
+  }
+
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 15)
+    setNumber(digits)
+    onChange(countryCode + digits)
+  }
+
+  const selectedCountry = COUNTRY_CODES.find((c) => c.code === countryCode) ?? COUNTRY_CODES[0]
+
+  return (
+    <div className="flex gap-1">
+      <Select value={countryCode} onValueChange={handleCountryChange}>
+        <SelectTrigger className="w-[110px] shrink-0 text-xs">
+          <SelectValue>
+            <span className="flex items-center gap-1">
+              <span>{selectedCountry.flag}</span>
+              <span className="font-medium">{selectedCountry.iso}</span>
+              <span className="text-muted-foreground">{selectedCountry.code}</span>
+            </span>
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent className="max-h-60">
+          {COUNTRY_CODES.map((c) => (
+            <SelectItem key={`${c.iso}-${c.code}`} value={c.code}>
+              <span className="flex items-center gap-2">
+                <span>{c.flag}</span>
+                <span className="font-medium">{c.iso}</span>
+                <span className="text-muted-foreground text-xs">{c.code}</span>
+              </span>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Input
+        type="tel"
+        placeholder="Phone number"
+        value={number}
+        onChange={handleNumberChange}
+        maxLength={15}
+        inputMode="numeric"
+      />
+    </div>
+  )
+}
 
 function EditForm({
   employee,
@@ -59,7 +168,13 @@ function EditForm({
     return d.toISOString().split('T')[0]
   }
 
-  const { register, handleSubmit, setValue, watch } = useForm<EditFormData>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<EditFormData>({
     resolver: zodResolver(updateEmployeeSchema),
     defaultValues: {
       last_name: employee.last_name,
@@ -70,10 +185,13 @@ function EditForm({
       department: employee.department,
       role: employee.role as (typeof ROLES)[number],
       active: employee.active,
+      jmbg: employee.jmbg ?? '',
     },
   })
 
   const role = watch('role')
+  const active = watch('active')
+  const phone = watch('phone') ?? ''
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -83,7 +201,8 @@ function EditForm({
       </div>
       <div className="space-y-2">
         <Label htmlFor="last_name">Last Name</Label>
-        <Input id="last_name" {...register('last_name')} />
+        <Input id="last_name" {...register('last_name')} maxLength={20} />
+        {errors.last_name && <p className="text-sm text-destructive">{errors.last_name.message}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="date_of_birth">Date of Birth</Label>
@@ -103,8 +222,9 @@ function EditForm({
         <Input id="username" defaultValue={employee.username} disabled />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone</Label>
-        <Input id="phone" {...register('phone')} />
+        <Label>Phone</Label>
+        <PhoneInput value={phone} onChange={(val) => setValue('phone', val)} />
+        {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="address">Address</Label>
@@ -117,6 +237,32 @@ function EditForm({
       <div className="space-y-2">
         <Label htmlFor="department">Department</Label>
         <Input id="department" {...register('department')} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="jmbg">JMBG</Label>
+        <Input
+          id="jmbg"
+          {...register('jmbg')}
+          placeholder="13-digit JMBG"
+          maxLength={13}
+          inputMode="numeric"
+        />
+        {errors.jmbg && <p className="text-sm text-destructive">{errors.jmbg.message}</p>}
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="status">Status</Label>
+        <Select
+          value={active ? 'active' : 'inactive'}
+          onValueChange={(val) => setValue('active', val === 'active')}
+        >
+          <SelectTrigger id="status">
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <div className="space-y-2">
         <Label htmlFor="role">Role</Label>
@@ -162,26 +308,33 @@ function CreateForm({
   })
 
   const role = watch('role')
+  const active = watch('active') ?? true
+  const phone = watch('phone') ?? ''
 
   const handleCreateSubmit = (data: CreateFormData) => {
     const timestamp = data.date_of_birth
       ? Math.floor(new Date(data.date_of_birth).getTime() / 1000)
       : 0
-    onSubmit({ ...data, date_of_birth: timestamp } as CreateEmployeeRequest)
+    const payload = {
+      ...data,
+      date_of_birth: timestamp,
+      jmbg: data.jmbg || undefined,
+    } as CreateEmployeeRequest
+    onSubmit(payload)
   }
 
   return (
     <form onSubmit={handleSubmit(handleCreateSubmit)} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="first_name">First Name</Label>
-        <Input id="first_name" {...register('first_name')} />
+        <Input id="first_name" {...register('first_name')} maxLength={20} />
         {errors.first_name && (
           <p className="text-sm text-destructive">{errors.first_name.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="last_name">Last Name</Label>
-        <Input id="last_name" {...register('last_name')} />
+        <Input id="last_name" {...register('last_name')} maxLength={20} />
         {errors.last_name && <p className="text-sm text-destructive">{errors.last_name.message}</p>}
       </div>
       <div className="space-y-2">
@@ -198,8 +351,9 @@ function CreateForm({
         {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone</Label>
-        <Input id="phone" {...register('phone')} />
+        <Label>Phone</Label>
+        <PhoneInput value={phone} onChange={(val) => setValue('phone', val)} />
+        {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="address">Address</Label>
@@ -217,6 +371,32 @@ function CreateForm({
       <div className="space-y-2">
         <Label htmlFor="department">Department</Label>
         <Input id="department" {...register('department')} />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="jmbg">JMBG</Label>
+        <Input
+          id="jmbg"
+          {...register('jmbg')}
+          placeholder="13-digit JMBG"
+          maxLength={13}
+          inputMode="numeric"
+        />
+        {errors.jmbg && <p className="text-sm text-destructive">{errors.jmbg.message}</p>}
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="status">Status</Label>
+        <Select
+          value={active ? 'active' : 'inactive'}
+          onValueChange={(val) => setValue('active', val === 'active')}
+        >
+          <SelectTrigger id="status">
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <div className="space-y-2">
         <Label htmlFor="role">Role</Label>

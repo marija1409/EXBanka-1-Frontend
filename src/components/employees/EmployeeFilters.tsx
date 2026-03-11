@@ -8,26 +8,33 @@ interface EmployeeFiltersProps {
 }
 
 export function EmployeeFilters({ onFilter }: EmployeeFiltersProps) {
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [position, setPosition] = useState('')
+  const [search, setSearch] = useState('')
 
   const handleSearch = () => {
-    onFilter({
-      ...(email && { email }),
-      ...(name && { name }),
-      ...(position && { position }),
-    })
+    const trimmed = search.trim()
+    if (!trimmed) {
+      onFilter({})
+      return
+    }
+    if (trimmed.includes('@')) {
+      onFilter({ email: trimmed })
+    } else {
+      onFilter({ name: trimmed })
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') handleSearch()
   }
 
   return (
     <div className="flex gap-2 mb-4">
-      <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
       <Input
-        placeholder="Position"
-        value={position}
-        onChange={(e) => setPosition(e.target.value)}
+        placeholder="Search by name, email or position..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        onKeyDown={handleKeyDown}
+        className="max-w-sm"
       />
       <Button onClick={handleSearch}>Search</Button>
     </div>

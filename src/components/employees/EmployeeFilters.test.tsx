@@ -8,19 +8,39 @@ const mockOnFilter = jest.fn()
 beforeEach(() => jest.clearAllMocks())
 
 describe('EmployeeFilters', () => {
-  it('renders search inputs for email, name, position', () => {
+  it('renders a single search input', () => {
     renderWithProviders(<EmployeeFilters onFilter={mockOnFilter} />)
-    expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/name/i)).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/position/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/search by name, email or position/i)).toBeInTheDocument()
   })
 
-  it('calls onFilter when search button is clicked', async () => {
+  it('calls onFilter with email when input contains @', async () => {
     renderWithProviders(<EmployeeFilters onFilter={mockOnFilter} />)
-    await userEvent.type(screen.getByPlaceholderText(/email/i), 'jane')
+    await userEvent.type(
+      screen.getByPlaceholderText(/search by name, email or position/i),
+      'jane@example.com'
+    )
     await userEvent.click(screen.getByRole('button', { name: /search/i }))
     await waitFor(() => {
-      expect(mockOnFilter).toHaveBeenCalledWith(expect.objectContaining({ email: 'jane' }))
+      expect(mockOnFilter).toHaveBeenCalledWith(
+        expect.objectContaining({ email: 'jane@example.com' })
+      )
+    })
+  })
+
+  it('calls onFilter with name when input has no @', async () => {
+    renderWithProviders(<EmployeeFilters onFilter={mockOnFilter} />)
+    await userEvent.type(screen.getByPlaceholderText(/search by name, email or position/i), 'Jane')
+    await userEvent.click(screen.getByRole('button', { name: /search/i }))
+    await waitFor(() => {
+      expect(mockOnFilter).toHaveBeenCalledWith(expect.objectContaining({ name: 'Jane' }))
+    })
+  })
+
+  it('calls onFilter with empty object when input is cleared', async () => {
+    renderWithProviders(<EmployeeFilters onFilter={mockOnFilter} />)
+    await userEvent.click(screen.getByRole('button', { name: /search/i }))
+    await waitFor(() => {
+      expect(mockOnFilter).toHaveBeenCalledWith({})
     })
   })
 })
