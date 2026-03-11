@@ -26,7 +26,7 @@ interface EmployeeFormProps {
 const createFormSchema = z.object({
   first_name: z.string().min(1, 'First name is required'),
   last_name: z.string().min(1, 'Last name is required'),
-  date_of_birth: z.string().min(1, 'Date of birth is required'),
+  date_of_birth: z.string().optional(),
   gender: z.string().optional(),
   email: z.string().email('Invalid email address'),
   phone: z.string().optional(),
@@ -34,9 +34,11 @@ const createFormSchema = z.object({
   username: z.string().min(1, 'Username is required'),
   position: z.string().optional(),
   department: z.string().optional(),
-  role: z.enum(['EmployeeBasic', 'EmployeeAgent', 'EmployeeSupervisor', 'EmployeeAdmin'], {
-    message: 'Role is required',
-  }),
+  role: z
+    .enum(['EmployeeBasic', 'EmployeeAgent', 'EmployeeSupervisor', 'EmployeeAdmin'], {
+      message: 'Role is required',
+    })
+    .optional(),
   active: z.boolean().optional(),
 })
 
@@ -165,7 +167,7 @@ function CreateForm({
     const timestamp = data.date_of_birth
       ? Math.floor(new Date(data.date_of_birth).getTime() / 1000)
       : 0
-    onSubmit({ ...data, date_of_birth: timestamp })
+    onSubmit({ ...data, date_of_birth: timestamp } as CreateEmployeeRequest)
   }
 
   return (
