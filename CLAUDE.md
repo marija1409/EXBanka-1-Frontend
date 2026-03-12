@@ -243,3 +243,27 @@ export const getAccount = (id: string): Promise<Account> =>
 2. Auto-create branch if on `main` when user requests a commit
 3. Create PR only on explicit request ("create PR", "make PR")
 4. Merge only on explicit confirmation ("merge this PR")
+
+---
+
+## Specification Maintenance (MANDATORY)
+
+**`specification.md` in the project root MUST be kept up to date.**
+
+After every commit that introduces functional changes (new features, new pages, new components, new API functions, new routes, new types, schema changes, or test coverage changes), update `specification.md` to reflect:
+
+1. **Project Structure** — add/remove/rename files in the directory tree
+2. **Routes** — add/remove/change routes and their associated pages
+3. **Pages** — update page descriptions if behavior changes
+4. **Components** — add new components, update descriptions of modified ones
+5. **State Management** — update slice state shape, thunks, or selectors if changed
+6. **API Layer** — add/remove API functions
+7. **Custom Hooks** — add/remove hooks
+8. **Types & Interfaces** — add/update type definitions
+9. **Validation Schemas** — add/update schemas
+10. **Test Coverage** — re-run `npm test -- --coverage --coverageReporters=text` and update the coverage table and percentages. Update the `_Last updated_` date at the top.
+
+**Do not update `specification.md` for:**
+- Refactors with no visible behavior change
+- Style/formatting-only changes
+- Config-only changes (`vite.config.ts`, `.eslintrc`, etc.)
