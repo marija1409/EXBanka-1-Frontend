@@ -1,7 +1,3 @@
-#Follow the given project structure and add files and directories as needed.
-#Technical requirements: use React with Typescript, never use "any" type. Only do strong typing, everything you create must have a type. Use Tailwind for CSS. Use Redux Toolkit for state management. Create the full Redux store flow. For ESLint configuration, setup a basic config using best Front-End practices. Add Husky for commit checks. Husky should run "npm run Lint", "npm run check-types", "npm run test". For testing library use Jest and create unit tests for components. Everything you implement should follow TDD principle so first create tests for the feature, then implement the feature, then run tests to make sure they all pass.
-#If you need extra context use the given .md files provided in CLAUDE.md file
-
 # Uvod
 
 Ovo je specifikacija projekta za generaciju **2025/26**. Specifikacioni tim ima zadatke:
