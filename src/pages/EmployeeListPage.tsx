@@ -10,6 +10,7 @@ import { useAppSelector } from '@/hooks/useAppSelector'
 import { selectCurrentUser } from '@/store/selectors/authSelectors'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { ErrorMessage } from '@/components/shared/ErrorMessage'
+import { formatDateLocale } from '@/lib/utils/dateFormatter'
 import type { FilterCategory } from '@/types/employee'
 
 const PAGE_SIZE = 20
@@ -22,17 +23,12 @@ function MeTab() {
   if (isLoading) return <LoadingSpinner />
   if (!employee) return <ErrorMessage message="Could not load your profile." />
 
-  const formatDate = (ts: number) => {
-    if (!ts) return '—'
-    return new Date(ts * 1000).toLocaleDateString()
-  }
-
   const rows: { label: string; value: string | boolean | undefined }[] = [
     { label: 'First Name', value: employee.first_name },
     { label: 'Last Name', value: employee.last_name },
     { label: 'Email', value: employee.email },
     { label: 'Username', value: employee.username },
-    { label: 'Date of Birth', value: formatDate(employee.date_of_birth) },
+    { label: 'Date of Birth', value: formatDateLocale(employee.date_of_birth) },
     { label: 'Gender', value: employee.gender },
     { label: 'Phone', value: employee.phone },
     { label: 'Address', value: employee.address },

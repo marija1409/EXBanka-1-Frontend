@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { COUNTRY_CODES } from './employeeConstants'
+import { COUNTRY_CODES } from '@/lib/utils/constants'
 
 interface PhoneInputProps {
   value: string

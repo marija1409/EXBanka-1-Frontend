@@ -13,7 +13,8 @@ import {
 import { updateEmployeeSchema } from '@/lib/utils/validation'
 import { FormField } from '@/components/shared/FormField'
 import { PhoneInput } from './PhoneInput'
-import { ROLES, GENDERS, formatRoleLabel, formatDateDisplay } from './employeeConstants'
+import { EMPLOYEE_ROLES as ROLES, GENDERS, formatRoleLabel } from '@/lib/utils/constants'
+import { formatDateDisplay } from '@/lib/utils/dateFormatter'
 import type { Employee, UpdateEmployeeRequest } from '@/types/employee'
 
 type EditFormData = z.infer<typeof updateEmployeeSchema>
