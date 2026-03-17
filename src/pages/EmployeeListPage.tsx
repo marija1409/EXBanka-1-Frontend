@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { EmployeeTable } from '@/components/employees/EmployeeTable'
@@ -7,40 +7,23 @@ import { EmployeeProfileTab } from '@/components/employees/EmployeeProfileTab'
 import { PaginationControls } from '@/components/shared/PaginationControls'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { useEmployees } from '@/hooks/useEmployees'
-import { usePagination } from '@/hooks/usePagination'
-import type { FilterCategory } from '@/types/employee'
+import type { EmployeeFilters as EmployeeFiltersType, FilterCategory } from '@/types/employee'
 
 const PAGE_SIZE = 20
 
 export function EmployeeListPage() {
   const navigate = useNavigate()
-  const { data, isLoading } = useEmployees()
-  const [filter, setFilter] = useState<{
-    category: FilterCategory
-    value: string
-  } | null>(null)
+  const [filter, setFilter] = useState<{ category: FilterCategory; value: string } | null>(null)
+  const [page, setPage] = useState(1)
 
-  const filteredEmployees = useMemo(() => {
-    const employees = data?.employees ?? []
-    if (!filter || !filter.value.trim()) return employees
-    const val = filter.value.toLowerCase().trim()
-    return employees.filter((emp) => {
-      if (filter.category === 'all') {
-        return (['first_name', 'last_name', 'email', 'position'] as const).some(
-          (field) => emp[field]?.toLowerCase().includes(val) ?? false
-        )
-      }
-      const field = emp[filter.category]
-      return field?.toLowerCase().includes(val) ?? false
-    })
-  }, [data?.employees, filter])
-
-  const {
+  const apiFilters: EmployeeFiltersType = {
     page,
-    setPage,
-    totalPages,
-    paginatedItems: paginatedEmployees,
-  } = usePagination(filteredEmployees, PAGE_SIZE)
+    page_size: PAGE_SIZE,
+    ...(filter ? { [filter.category]: filter.value } : {}),
+  }
+
+  const { data, isLoading } = useEmployees(apiFilters)
+  const totalPages = Math.max(1, Math.ceil((data?.total_count ?? 0) / PAGE_SIZE))
 
   const handleFilterChange = (newFilter: { category: FilterCategory; value: string } | null) => {
     setFilter(newFilter)
@@ -72,12 +55,10 @@ export function EmployeeListPage() {
 
           {isLoading ? (
             <LoadingSpinner />
-          ) : paginatedEmployees.length ? (
+          ) : data?.employees.length ? (
             <>
-              <EmployeeTable employees={paginatedEmployees} onRowClick={handleRowClick} />
-              <p className="text-sm text-muted-foreground mt-2">
-                {filteredEmployees.length} of {data?.employees.length ?? 0} employees
-              </p>
+              <EmployeeTable employees={data.employees} onRowClick={handleRowClick} />
+              <p className="text-sm text-muted-foreground mt-2">{data.total_count} employees</p>
               <PaginationControls page={page} totalPages={totalPages} onPageChange={setPage} />
             </>
           ) : (
