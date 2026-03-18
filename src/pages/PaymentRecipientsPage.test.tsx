@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { renderWithProviders } from '@/__tests__/utils/test-utils'
 import { PaymentRecipientsPage } from '@/pages/PaymentRecipientsPage'
 import * as usePaymentsHook from '@/hooks/usePayments'
@@ -43,5 +44,25 @@ describe('PaymentRecipientsPage', () => {
     } as any)
     renderWithProviders(<PaymentRecipientsPage />)
     expect(screen.getByRole('button', { name: /izmeni/i })).toBeInTheDocument()
+  })
+
+  it('pre-fills form when edit button is clicked', async () => {
+    const recipient = createMockPaymentRecipient()
+    jest.mocked(usePaymentsHook.usePaymentRecipients).mockReturnValue({
+      data: [recipient],
+      isLoading: false,
+    } as any)
+    jest.mocked(usePaymentsHook.useUpdatePaymentRecipient).mockReturnValue({
+      mutate: jest.fn(),
+      isPending: false,
+    } as any)
+
+    renderWithProviders(<PaymentRecipientsPage />)
+
+    await userEvent.click(screen.getByRole('button', { name: /izmeni/i }))
+
+    expect(screen.getByDisplayValue(recipient.name)).toBeInTheDocument()
+    expect(screen.getByDisplayValue(recipient.account_number)).toBeInTheDocument()
+    expect(screen.getByText(/izmeni primaoca/i)).toBeInTheDocument()
   })
 })

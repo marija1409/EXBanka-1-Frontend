@@ -39,6 +39,12 @@ export function PaymentRecipientsPage() {
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(paymentRecipientSchema),
+    defaultValues: {
+      name: '',
+      account_number: '',
+      reference: '',
+      payment_code: '',
+    },
   })
 
   const onSubmit = (data: FormValues) => {
