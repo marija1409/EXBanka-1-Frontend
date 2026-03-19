@@ -14,12 +14,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createPaymentSchema } from '@/lib/utils/validation'
 import { PAYMENT_CODES } from '@/lib/constants/banking'
 import { formatCurrency } from '@/lib/utils/format'
+import { useRecipientAutofill } from '@/hooks/useRecipientAutofill'
 import type { Account } from '@/types/account'
 import type { PaymentRecipient } from '@/types/payment'
 import type { z } from 'zod'
 
 type FormValues = z.infer<typeof createPaymentSchema>
-
 interface NewPaymentFormProps {
   accounts: Account[]
   recipients: PaymentRecipient[] | undefined
@@ -37,6 +37,7 @@ export function NewPaymentForm({ accounts, recipients, onSubmit }: NewPaymentFor
     resolver: zodResolver(createPaymentSchema),
   })
 
+  const { handleRecipientSelect } = useRecipientAutofill(recipients, setValue)
   return (
     <Card>
       <CardHeader>
@@ -72,17 +73,7 @@ export function NewPaymentForm({ accounts, recipients, onSubmit }: NewPaymentFor
           {recipients && recipients.length > 0 && (
             <div>
               <Label>Sačuvani primaoci</Label>
-              <Select
-                onValueChange={(id) => {
-                  const r = recipients.find((rec) => String(rec.id) === id)
-                  if (r) {
-                    setValue('to_account', r.account_number)
-                    setValue('receiver_name', r.name)
-                    if (r.reference) setValue('reference', r.reference)
-                    if (r.payment_code) setValue('payment_code', r.payment_code)
-                  }
-                }}
-              >
+              <Select onValueChange={handleRecipientSelect}>
                 <SelectTrigger>
                   <SelectValue placeholder="Izaberite primaoca" />
                 </SelectTrigger>
