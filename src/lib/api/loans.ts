@@ -28,9 +28,9 @@ export async function getLoanRequests(
   filters?: LoanRequestFilters
 ): Promise<LoanRequestListResponse> {
   const params = new URLSearchParams()
-  if (filters?.loan_type) params.append('loan_type', filters.loan_type)
-  if (filters?.account_number) params.append('account_number', filters.account_number)
-  if (filters?.status) params.append('status', filters.status)
+  if (filters?.loan_type) params.append('loan_type_filter', filters.loan_type)
+  if (filters?.account_number) params.append('account_number_filter', filters.account_number)
+  if (filters?.status) params.append('status_filter', filters.status)
   if (filters?.page) params.append('page', String(filters.page))
   if (filters?.page_size) params.append('page_size', String(filters.page_size))
   const response = await apiClient.get<LoanRequestListResponse>('/api/loans/requests', { params })
@@ -47,11 +47,11 @@ export async function rejectLoanRequest(id: number): Promise<void> {
 
 export async function getAllLoans(filters?: LoanFilters): Promise<LoanListResponse> {
   const params = new URLSearchParams()
-  if (filters?.loan_type) params.append('loan_type', filters.loan_type)
-  if (filters?.account_number) params.append('account_number', filters.account_number)
-  if (filters?.status) params.append('status', filters.status)
+  if (filters?.loan_type) params.append('loan_type_filter', filters.loan_type)
+  if (filters?.account_number) params.append('account_number_filter', filters.account_number)
+  if (filters?.status) params.append('status_filter', filters.status)
   if (filters?.page) params.append('page', String(filters.page))
   if (filters?.page_size) params.append('page_size', String(filters.page_size))
-  const response = await apiClient.get<LoanListResponse>('/api/loans/all', { params })
+  const response = await apiClient.get<LoanListResponse>('/api/loans', { params })
   return response.data
 }
