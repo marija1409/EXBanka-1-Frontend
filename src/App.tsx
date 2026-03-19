@@ -129,7 +129,7 @@ export default function App() {
         <Route
           path="/admin/loans/requests"
           element={
-            <ProtectedRoute requiredRole="Employee" requiredPermission="loans.manage">
+            <ProtectedRoute requiredRole="Employee">
               <AdminLoanRequestsPage />
             </ProtectedRoute>
           }
@@ -137,7 +137,7 @@ export default function App() {
         <Route
           path="/admin/loans"
           element={
-            <ProtectedRoute requiredRole="Employee" requiredPermission="loans.manage">
+            <ProtectedRoute requiredRole="Employee">
               <AdminLoansPage />
             </ProtectedRoute>
           }
