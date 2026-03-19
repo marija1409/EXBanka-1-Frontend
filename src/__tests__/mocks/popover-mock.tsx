@@ -1,5 +1,5 @@
-import { createContext, useContext, useState } from 'react'
-import React from 'react'
+import { createContext, isValidElement, cloneElement, useContext, useState } from 'react'
+import type React from 'react'
 
 const PopoverContext = createContext<{
   open: boolean
@@ -32,9 +32,13 @@ export function PopoverTrigger({
   asChild?: boolean
 }) {
   const { setOpen, open } = useContext(PopoverContext)
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<{ onClick?: () => void }>, {
-      onClick: () => setOpen(!open),
+  if (asChild && isValidElement(children)) {
+    const child = children as React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>
+    return cloneElement(child, {
+      onClick: (e: React.MouseEvent) => {
+        child.props.onClick?.(e)
+        setOpen(!open)
+      },
     })
   }
   return <button onClick={() => setOpen(!open)}>{children}</button>
