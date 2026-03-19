@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { useAccount, useUpdateAccount } from '@/hooks/useAccounts'
+import { useAccount, useUpdateAccount, useClientAccounts } from '@/hooks/useAccounts'
 import { AccountCard } from '@/components/accounts/AccountCard'
 import { RenameAccountDialog } from '@/components/accounts/RenameAccountDialog'
 import { ChangeLimitsDialog } from '@/components/accounts/ChangeLimitsDialog'
@@ -15,6 +15,10 @@ export function AccountDetailsPage() {
   const accountId = Number(id)
   const { data: account, isLoading } = useAccount(accountId)
   const updateAccount = useUpdateAccount(accountId)
+  const { data: allAccountsData } = useClientAccounts()
+  const existingNames = (allAccountsData?.accounts ?? [])
+    .filter((a) => a.id !== accountId)
+    .map((a) => a.name)
   const [renameOpen, setRenameOpen] = useState(false)
   const [limitsOpen, setLimitsOpen] = useState(false)
 
@@ -96,6 +100,7 @@ export function AccountDetailsPage() {
         open={renameOpen}
         onOpenChange={setRenameOpen}
         currentName={account.name}
+        existingNames={existingNames}
         onRename={handleRename}
         loading={updateAccount.isPending}
       />
