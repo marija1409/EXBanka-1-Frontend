@@ -1,16 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAllClients } from '@/hooks/useClients'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { ClientFilters } from '@/components/admin/ClientFilters'
+import { ClientTable } from '@/components/admin/ClientTable'
 
 export function AdminClientsPage() {
   const navigate = useNavigate()
@@ -26,55 +19,15 @@ export function AdminClientsPage() {
         <Button onClick={() => navigate('/admin/clients/new')}>Novi klijent</Button>
       </div>
 
-      <div className="flex gap-3">
-        <Input
-          placeholder="Ime klijenta..."
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <Input placeholder="Email..." value={email} onChange={(e) => setEmail(e.target.value)} />
-      </div>
+      <ClientFilters name={name} onNameChange={setName} email={email} onEmailChange={setEmail} />
 
       {isLoading ? (
         <p>Učitavanje...</p>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Ime</TableHead>
-              <TableHead>Prezime</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Telefon</TableHead>
-              <TableHead>Akcije</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {clients.map((client) => (
-              <TableRow key={client.id}>
-                <TableCell>{client.first_name}</TableCell>
-                <TableCell>{client.last_name}</TableCell>
-                <TableCell>{client.email}</TableCell>
-                <TableCell>{client.phone ?? '—'}</TableCell>
-                <TableCell>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => navigate(`/admin/clients/${client.id}/edit`)}
-                  >
-                    Izmeni
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-            {clients.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
-                  Nema klijenata.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <ClientTable
+          clients={clients}
+          onEdit={(clientId) => navigate(`/admin/clients/${clientId}/edit`)}
+        />
       )}
     </div>
   )
