@@ -5,6 +5,7 @@ import type { CreateInternalTransferRequest } from '@/types/payment'
 
 interface TransferConfirmationProps {
   formData: CreateInternalTransferRequest
+  currency: string
   onConfirm: () => void
   onBack: () => void
   submitting: boolean
@@ -22,6 +23,7 @@ function ConfirmRow({ label, value }: { label: string; value: string }) {
 
 export function TransferConfirmation({
   formData,
+  currency,
   onConfirm,
   onBack,
   submitting,
@@ -35,7 +37,7 @@ export function TransferConfirmation({
       <CardContent className="space-y-3">
         <ConfirmRow label="Sa računa" value={formData.from_account} />
         <ConfirmRow label="Na račun" value={formData.to_account} />
-        <ConfirmRow label="Iznos" value={formatCurrency(formData.amount, 'RSD')} />
+        <ConfirmRow label="Iznos" value={formatCurrency(formData.amount, currency)} />
         {formData.description && <ConfirmRow label="Opis" value={formData.description} />}
         <div className="flex gap-3 pt-4">
           <Button variant="outline" className="flex-1" onClick={onBack}>

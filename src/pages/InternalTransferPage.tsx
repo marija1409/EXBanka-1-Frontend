@@ -47,9 +47,12 @@ export function InternalTransferPage() {
 
   if (step === 'confirmation' && formData) {
     const data = formData as FormValues
+    const fromAccount = accounts.find((a) => a.account_number === data.from_account)
+    const currency = fromAccount?.currency ?? 'RSD'
     return (
       <TransferConfirmation
         formData={data}
+        currency={currency}
         submitting={submitting}
         error={error}
         onConfirm={() => dispatch(submitPayment({ type: 'internal', data: formData! }))}

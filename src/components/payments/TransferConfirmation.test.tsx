@@ -20,6 +20,7 @@ describe('TransferConfirmation', () => {
     renderWithProviders(
       <TransferConfirmation
         formData={defaultFormData}
+        currency="RSD"
         onConfirm={onConfirm}
         onBack={onBack}
         submitting={false}
@@ -34,6 +35,7 @@ describe('TransferConfirmation', () => {
     renderWithProviders(
       <TransferConfirmation
         formData={defaultFormData}
+        currency="RSD"
         onConfirm={onConfirm}
         onBack={onBack}
         submitting={false}
@@ -49,6 +51,7 @@ describe('TransferConfirmation', () => {
     renderWithProviders(
       <TransferConfirmation
         formData={defaultFormData}
+        currency="RSD"
         onConfirm={onConfirm}
         onBack={onBack}
         submitting={false}
@@ -64,6 +67,7 @@ describe('TransferConfirmation', () => {
     renderWithProviders(
       <TransferConfirmation
         formData={defaultFormData}
+        currency="RSD"
         onConfirm={onConfirm}
         onBack={onBack}
         submitting={false}
