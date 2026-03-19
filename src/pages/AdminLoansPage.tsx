@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAllLoans } from '@/hooks/useLoans'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
+import { LoanFilters } from '@/components/loans/LoanFilters'
 import {
   Table,
   TableBody,
@@ -34,12 +34,7 @@ export function AdminLoansPage() {
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Svi krediti</h1>
 
-      <Input
-        placeholder="Broj računa..."
-        value={accountNumber}
-        onChange={(e) => setAccountNumber(e.target.value)}
-        className="max-w-sm"
-      />
+      <LoanFilters accountNumber={accountNumber} onAccountNumberChange={setAccountNumber} />
 
       {isLoading ? (
         <p>Učitavanje...</p>
