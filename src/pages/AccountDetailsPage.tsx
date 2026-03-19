@@ -45,11 +45,21 @@ export function AccountDetailsPage() {
           <CardTitle>Detalji</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          {account.owner_name && <InfoRow label="Vlasnik" value={account.owner_name} />}
+          <InfoRow
+            label="Tip računa"
+            value={account.account_type === 'FOREIGN_CURRENCY' ? 'Devizni' : 'Tekući'}
+          />
+          <InfoRow
+            label="Tip vlasnika"
+            value={account.owner_type === 'BUSINESS' ? 'Poslovni' : 'Lični'}
+          />
           <InfoRow label="Stanje" value={formatCurrency(account.balance, account.currency)} />
           <InfoRow
             label="Raspoloživo"
             value={formatCurrency(account.available_balance, account.currency)}
           />
+          <InfoRow label="Rezervisana sredstva" value={formatCurrency(0, account.currency)} />
           {account.daily_limit !== undefined && (
             <InfoRow
               label="Dnevni limit"
@@ -67,9 +77,14 @@ export function AccountDetailsPage() {
 
       <BusinessAccountInfo company={account.company} />
 
-      <Button variant="outline" onClick={() => setRenameOpen(true)}>
-        Preimenuj račun
-      </Button>
+      <div className="flex gap-3">
+        <Button variant="outline" onClick={() => navigate('/payments/new')}>
+          Novo plaćanje
+        </Button>
+        <Button variant="outline" onClick={() => setRenameOpen(true)}>
+          Preimenuj račun
+        </Button>
+      </div>
 
       {account.daily_limit !== undefined && (
         <Button variant="outline" onClick={() => setLimitsOpen(true)}>
