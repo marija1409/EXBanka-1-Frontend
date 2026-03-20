@@ -75,7 +75,7 @@ export interface LoanFilters {
 export interface LoanRequestFilters {
   loan_type?: LoanType
   account_number?: string
-  status?: LoanRequestStatus
+  status?: string
   page?: number
   page_size?: number
 }

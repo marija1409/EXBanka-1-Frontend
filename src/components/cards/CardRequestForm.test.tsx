@@ -9,7 +9,7 @@ const mockAccounts = [
     account_number: '111000100000000011',
     account_name: 'Main RSD',
     currency_code: 'RSD',
-    account_category: 'PERSONAL',
+    account_category: 'personal',
   },
 ]
 

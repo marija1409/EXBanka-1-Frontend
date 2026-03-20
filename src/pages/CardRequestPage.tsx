@@ -6,6 +6,8 @@ import {
   useConfirmCardRequest,
   useRequestCardForAuthorizedPerson,
 } from '@/hooks/useCards'
+import { useAppSelector } from '@/hooks/useAppSelector'
+import { selectCurrentUser } from '@/store/selectors/authSelectors'
 import { CardRequestForm } from '@/components/cards/CardRequestForm'
 import { AuthorizedPersonForm } from '@/components/cards/AuthorizedPersonForm'
 import { VerificationCodeInput } from '@/components/cards/VerificationCodeInput'
@@ -17,6 +19,7 @@ type Step = 'select' | 'business-choice' | 'authorized-person' | 'verify' | 'suc
 
 export function CardRequestPage() {
   const navigate = useNavigate()
+  const user = useAppSelector(selectCurrentUser)
   const { data: accountsData, isLoading } = useClientAccounts()
   const accounts = accountsData?.accounts ?? []
   const requestCard = useRequestCard()
@@ -32,11 +35,16 @@ export function CardRequestPage() {
     setSelectedAccount(accountNumber)
     setSelectedBrand(cardBrand)
     const acc = accounts.find((a) => a.account_number === accountNumber)
-    if (acc?.account_category === 'COMPANY') {
+    if (acc?.account_category === 'business') {
       setStep('business-choice')
     } else {
       requestCard.mutate(
-        { account_number: accountNumber, card_brand: cardBrand },
+        {
+          account_number: accountNumber,
+          owner_id: user?.id ?? 0,
+          owner_type: 'CLIENT',
+          card_brand: cardBrand,
+        },
         { onSuccess: () => setStep('verify') }
       )
     }
@@ -44,15 +52,33 @@ export function CardRequestPage() {
 
   const handleRequestForSelf = () => {
     requestCard.mutate(
-      { account_number: selectedAccount, card_brand: selectedBrand },
+      {
+        account_number: selectedAccount,
+        owner_id: user?.id ?? 0,
+        owner_type: 'CLIENT',
+        card_brand: selectedBrand,
+      },
       { onSuccess: () => setStep('verify') }
     )
   }
 
   const handleRequestForAP = (data: CreateAuthorizedPersonRequest) => {
+    const acc = accounts.find((a) => a.account_number === selectedAccount)
     requestForAP.mutate(
-      { account_number: selectedAccount, authorized_person: data },
-      { onSuccess: () => setStep('verify') }
+      { ...data, account_id: acc?.id ?? 0 },
+      {
+        onSuccess: (ap) => {
+          requestCard.mutate(
+            {
+              account_number: selectedAccount,
+              owner_id: ap.id,
+              owner_type: 'AUTHORIZED_PERSON',
+              card_brand: selectedBrand,
+            },
+            { onSuccess: () => setStep('verify') }
+          )
+        },
+      }
     )
   }
 
@@ -82,7 +108,10 @@ export function CardRequestPage() {
         <Button variant="ghost" onClick={() => setStep('business-choice')}>
           ← Nazad
         </Button>
-        <AuthorizedPersonForm onSubmit={handleRequestForAP} loading={requestForAP.isPending} />
+        <AuthorizedPersonForm
+          onSubmit={handleRequestForAP}
+          loading={requestForAP.isPending || requestCard.isPending}
+        />
       </div>
     )
   }

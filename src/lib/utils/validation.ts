@@ -72,9 +72,8 @@ export const createEmployeeSchema = z.object({
 // --- Banking Schemas ---
 
 const LOAN_TYPES_ENUM = ['CASH', 'MORTGAGE', 'AUTO', 'REFINANCING', 'STUDENT'] as const
-const ACCOUNT_KIND_ENUM = ['checking', 'savings', 'foreign', 'business'] as const
-const ACCOUNT_TYPE_ENUM = ['CURRENT', 'TERM'] as const
-const ACCOUNT_CATEGORY_ENUM = ['PERSONAL', 'COMPANY'] as const
+const ACCOUNT_KIND_ENUM = ['current', 'foreign'] as const
+const ACCOUNT_CATEGORY_ENUM = ['personal', 'business'] as const
 
 export const companySchema = z.object({
   name: z.string().min(1, 'Company name is required'),
@@ -87,12 +86,12 @@ export const companySchema = z.object({
 export const createAccountSchema = z.object({
   owner_id: z.number().min(1, 'Owner is required'),
   account_kind: z.enum(ACCOUNT_KIND_ENUM),
-  account_type: z.enum(ACCOUNT_TYPE_ENUM),
+  account_type: z.string().min(1, 'Account type is required'),
   account_category: z.enum(ACCOUNT_CATEGORY_ENUM).optional(),
   currency_code: z.string().min(1, 'Currency is required'),
   initial_balance: z.number().min(0, 'Balance cannot be negative').optional(),
   create_card: z.boolean().optional(),
-  card_brand: z.enum(['VISA', 'MASTERCARD', 'DINA'] as const).optional(),
+  card_brand: z.enum(['visa', 'mastercard', 'dinacard'] as const).optional(),
   daily_limit: z.number().min(0).optional(),
   monthly_limit: z.number().min(0).optional(),
 })
