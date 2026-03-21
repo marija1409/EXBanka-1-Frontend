@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import type { FilterOption } from '@/types/filters'
 
 interface MultiselectDropdownProps {
@@ -36,7 +37,7 @@ export function MultiselectDropdown({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className={buttonVariants({ variant: 'outline' })}>
+      <PopoverTrigger className={cn(buttonVariants({ variant: 'outline' }), 'border-input')}>
         {triggerLabel}
         <ChevronDown className={`ml-2 h-4 w-4 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
       </PopoverTrigger>
