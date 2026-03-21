@@ -1,5 +1,6 @@
 import { apiClient } from '@/lib/api/axios'
 import type { Role, Permission, CreateRolePayload } from '@/types/roles'
+import type { Employee } from '@/types/employee'
 
 export async function getRoles(): Promise<{ roles: Role[] }> {
   const { data } = await apiClient.get<{ roles: Role[] }>('/api/roles')
@@ -28,8 +29,8 @@ export async function getPermissions(): Promise<{ permissions: Permission[] }> {
   return data
 }
 
-export async function setEmployeeRoles(employeeId: number, roleNames: string[]): Promise<unknown> {
-  const { data } = await apiClient.put(`/api/employees/${employeeId}/roles`, {
+export async function setEmployeeRoles(employeeId: number, roleNames: string[]): Promise<Employee> {
+  const { data } = await apiClient.put<Employee>(`/api/employees/${employeeId}/roles`, {
     role_names: roleNames,
   })
   return data
@@ -38,8 +39,8 @@ export async function setEmployeeRoles(employeeId: number, roleNames: string[]):
 export async function setEmployeePermissions(
   employeeId: number,
   permissionCodes: string[]
-): Promise<unknown> {
-  const { data } = await apiClient.put(`/api/employees/${employeeId}/permissions`, {
+): Promise<Employee> {
+  const { data } = await apiClient.put<Employee>(`/api/employees/${employeeId}/permissions`, {
     permission_codes: permissionCodes,
   })
   return data

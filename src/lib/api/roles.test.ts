@@ -78,7 +78,22 @@ describe('roles API', () => {
   })
 
   it('PUT /api/employees/:id/roles sets employee roles', async () => {
-    const mockEmployee = { id: 3, role: 'EmployeeBasic' }
+    const mockEmployee = {
+      id: 3,
+      first_name: 'John',
+      last_name: 'Doe',
+      date_of_birth: 631152000,
+      gender: 'M',
+      email: 'john.doe@bank.com',
+      phone: '123456789',
+      address: '123 Main St',
+      username: 'johndoe',
+      position: 'Loan Officer',
+      department: 'Loans',
+      active: true,
+      role: 'EmployeeBasic',
+      permissions: [],
+    }
     mockPut.mockResolvedValue({ data: mockEmployee })
 
     const result = await setEmployeeRoles(3, ['EmployeeBasic'])
@@ -90,7 +105,22 @@ describe('roles API', () => {
   })
 
   it('PUT /api/employees/:id/permissions sets employee permissions', async () => {
-    const mockEmployee = { id: 3, permissions: ['clients.read'] }
+    const mockEmployee = {
+      id: 3,
+      first_name: 'John',
+      last_name: 'Doe',
+      date_of_birth: 631152000,
+      gender: 'M',
+      email: 'john.doe@bank.com',
+      phone: '123456789',
+      address: '123 Main St',
+      username: 'johndoe',
+      position: 'Loan Officer',
+      department: 'Loans',
+      active: true,
+      role: 'EmployeeBasic',
+      permissions: ['clients.read'],
+    }
     mockPut.mockResolvedValue({ data: mockEmployee })
 
     const result = await setEmployeePermissions(3, ['clients.read'])
