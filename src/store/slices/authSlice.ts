@@ -78,11 +78,12 @@ const authSlice = createSlice({
         state.error = null
       })
       .addCase(loginThunk.fulfilled, (state, action) => {
+        const { tokens, user } = action.payload
+        state.user = user
+        state.userType = user.system_type
+        state.accessToken = tokens.access_token
+        state.refreshToken = tokens.refresh_token
         state.status = 'authenticated'
-        state.userType = 'employee'
-        state.user = action.payload.user
-        state.accessToken = action.payload.tokens.access_token
-        state.refreshToken = action.payload.tokens.refresh_token
         state.error = null
       })
       .addCase(loginThunk.rejected, (state, action) => {

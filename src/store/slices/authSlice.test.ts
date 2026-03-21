@@ -28,7 +28,7 @@ describe('authSlice', () => {
   })
 
   describe('loginThunk', () => {
-    it('sets userType to employee on success', async () => {
+    it('sets userType to "employee" when JWT has system_type employee', async () => {
       const tokens = { access_token: 'at', refresh_token: 'rt' }
       jest.mocked(authApi.login).mockResolvedValue(tokens)
       jest.mocked(jwt.decodeAuthToken).mockReturnValue({
@@ -42,7 +42,28 @@ describe('authSlice', () => {
       const store = createStore()
       await store.dispatch(loginThunk({ email: 'a@b.com', password: 'pass' }))
 
-      expect(store.getState().auth.userType).toBe('employee')
+      const state = store.getState().auth
+      expect(state.userType).toBe('employee')
+      expect(state.status).toBe('authenticated')
+    })
+
+    it('sets userType to "client" when JWT has system_type client', async () => {
+      const tokens = { access_token: 'tok', refresh_token: 'ref' }
+      jest.mocked(authApi.login).mockResolvedValue(tokens)
+      jest.mocked(jwt.decodeAuthToken).mockReturnValue({
+        id: 2,
+        email: 'client@b.com',
+        role: 'client',
+        permissions: [],
+        system_type: 'client',
+      })
+
+      const store = createStore()
+      await store.dispatch(loginThunk({ email: 'client@b.com', password: 'pass' }))
+
+      const state = store.getState().auth
+      expect(state.userType).toBe('client')
+      expect(state.status).toBe('authenticated')
     })
 
     it('sets authenticated state on success', async () => {
