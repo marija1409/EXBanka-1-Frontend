@@ -40,24 +40,6 @@ export const loginThunk = createAsyncThunk(
   }
 )
 
-export const clientLoginThunk = createAsyncThunk(
-  'auth/clientLogin',
-  async (credentials: LoginRequest, { rejectWithValue }) => {
-    try {
-      const tokens = await authApi.clientLogin(credentials)
-      const user = decodeAuthToken(tokens.access_token)
-      if (!user) {
-        return rejectWithValue('Failed to decode token')
-      }
-      sessionStorage.setItem('access_token', tokens.access_token)
-      sessionStorage.setItem('refresh_token', tokens.refresh_token)
-      return { tokens, user }
-    } catch {
-      return rejectWithValue('Invalid credentials')
-    }
-  }
-)
-
 export const logoutThunk = createAsyncThunk('auth/logout', async (_, { getState }) => {
   const state = getState() as { auth: AuthState }
   const refreshToken = state.auth.refreshToken
@@ -104,22 +86,6 @@ const authSlice = createSlice({
         state.error = null
       })
       .addCase(loginThunk.rejected, (state, action) => {
-        state.status = 'error'
-        state.error = action.payload as string
-      })
-      .addCase(clientLoginThunk.pending, (state) => {
-        state.status = 'loading'
-        state.error = null
-      })
-      .addCase(clientLoginThunk.fulfilled, (state, action) => {
-        state.status = 'authenticated'
-        state.userType = 'client'
-        state.user = action.payload.user
-        state.accessToken = action.payload.tokens.access_token
-        state.refreshToken = action.payload.tokens.refresh_token
-        state.error = null
-      })
-      .addCase(clientLoginThunk.rejected, (state, action) => {
         state.status = 'error'
         state.error = action.payload as string
       })

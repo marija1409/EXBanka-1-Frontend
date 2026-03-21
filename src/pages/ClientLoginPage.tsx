@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { LoginForm } from '@/components/auth/LoginForm'
 import { useAppDispatch } from '@/hooks/useAppDispatch'
 import { useAppSelector } from '@/hooks/useAppSelector'
-import { clientLoginThunk } from '@/store/slices/authSlice'
+import { loginThunk } from '@/store/slices/authSlice'
 import { selectUserType } from '@/store/selectors/authSelectors'
 import type { LoginRequest } from '@/types/auth'
 
@@ -20,7 +20,7 @@ export function ClientLoginPage() {
   }, [userType, navigate])
 
   const handleSubmit = (data: LoginRequest) => {
-    dispatch(clientLoginThunk(data))
+    dispatch(loginThunk(data))
   }
 
   return <LoginForm onSubmit={handleSubmit} isLoading={status === 'loading'} error={error} />

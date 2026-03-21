@@ -45,7 +45,7 @@ describe('ClientLoginPage', () => {
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
   })
 
-  it('dispatches clientLogin on form submit', async () => {
+  it('dispatches login on form submit', async () => {
     const tokens = { access_token: 'at', refresh_token: 'rt' }
     const user = {
       id: 2,
@@ -54,7 +54,7 @@ describe('ClientLoginPage', () => {
       permissions: [],
       system_type: 'client' as const,
     }
-    jest.mocked(authApi.clientLogin).mockResolvedValue(tokens)
+    jest.mocked(authApi.login).mockResolvedValue(tokens)
     jest.mocked(jwt.decodeAuthToken).mockReturnValue(user)
 
     renderWithProviders(<ClientLoginPage />, { route: '/client-login' })
@@ -64,7 +64,7 @@ describe('ClientLoginPage', () => {
     await userEvent.click(screen.getByRole('button', { name: /log in/i }))
 
     await waitFor(() => {
-      expect(authApi.clientLogin).toHaveBeenCalledWith({
+      expect(authApi.login).toHaveBeenCalledWith({
         email: 'client@b.com',
         password: 'Password12',
       })
