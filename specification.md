@@ -1,6 +1,6 @@
 # EXBanka Frontend — Project Specification
 
-_Last updated: 2026-03-21_
+_Last updated: 2026-03-24_
 
 ---
 
@@ -116,6 +116,19 @@ src/
 │   │   ├── AuthLayout.tsx            # Full-screen GIF background + centered Outlet
 │   │   └── Sidebar.tsx               # Nav links, user email, logout
 │   │   └── Sidebar.test.tsx
+│   ├── cards/
+│   │   ├── CardVisual.tsx + .test.tsx    # Credit-card-shaped visual: gradient, chip, brand logo, status overlay
+│   │   ├── CardBrandLogo.tsx + .test.tsx # SVG brand logos: Visa, Mastercard, DinaCard, Amex
+│   │   ├── CardItem.tsx + .test.tsx      # User-facing card tile using CardVisual
+│   │   ├── CardGrid.tsx + .test.tsx      # Responsive grid of CardItem components
+│   │   ├── CardRequestForm.tsx + .test.tsx  # Account selector for card request
+│   │   ├── AuthorizedPersonForm.tsx + .test.tsx  # Authorized person form (all fields incl. date_of_birth, gender)
+│   │   └── VerificationCodeInput.tsx + .test.tsx  # SMS/OTP code input for card confirmation
+│   ├── admin/
+│   │   ├── AdminCardItem.tsx + .test.tsx  # Admin card tile using CardVisual + block/unblock/deactivate buttons
+│   │   ├── AccountTable.tsx + .test.tsx   # Admin account list table
+│   │   ├── ClientTable.tsx + .test.tsx    # Admin client list table
+│   │   ├── EditClientForm.tsx + .test.tsx # Admin edit client form
 │   └── shared/
 │       ├── ProtectedRoute.tsx        # Auth + permission guard
 │       ├── ProtectedRoute.test.tsx
@@ -192,6 +205,8 @@ src/
 │   │   └── bankMargins.ts + .test.ts # Bank margins API calls
 │   └── utils/
 │       ├── constants.ts              # EMPLOYEE_ROLES, GENDERS, COUNTRY_CODES, formatRoleLabel
+│       ├── banking.ts                # CARD_BRANDS, CARD_STATUSES, CARD_STATUS_LABELS, CARD_STATUS_VARIANT, CARD_LIMITS
+│       ├── format.ts + .test.ts      # maskCardNumber (spaced format), formatAccountNumber, formatCurrency
 │       ├── dateFormatter.ts + .test.ts  # todayISO, formatDateDisplay, formatDateLocale
 │       ├── jwt.ts + .test.ts         # JWT decode utility
 │       └── validation.ts + .test.ts  # Zod schemas
@@ -201,7 +216,7 @@ src/
 │   ├── employee.ts                   # Employee-related TypeScript interfaces
 │   ├── account.ts                    # Account-related TypeScript interfaces
 │   ├── authorized-person.ts          # Authorized person interfaces
-│   ├── card.ts                       # Card-related TypeScript interfaces
+│   ├── card.ts                       # CardStatus ('ACTIVE'|'BLOCKED'|'DEACTIVATED'), CardType, CardBrand ('VISA'|'MASTERCARD'|'DINACARD'|'AMEX'), Card interface
 │   ├── client.ts                     # Client-related TypeScript interfaces
 │   ├── exchange.ts                   # Exchange rate interfaces
 │   ├── filters.ts                    # Shared filter interfaces
@@ -606,9 +621,27 @@ BankMargin           { id: number; loan_type: string; margin: number;
 
 ```typescript
 EMPLOYEE_ROLES   // array of { value, label } — roles selectable in forms
-GENDERS          // array of { value, label }
+GENDERS          // flat string array — ['Male', 'Female', 'Other', 'Misha']
 COUNTRY_CODES    // array of { code, label } — 30+ countries for PhoneInput
 formatRoleLabel(role: string): string
+```
+
+### Banking Constants (`lib/constants/banking.ts`)
+
+```typescript
+CARD_BRANDS          // [{ value: 'VISA'|'MASTERCARD'|'DINACARD'|'AMEX', label }]
+CARD_STATUSES        // [{ value: 'ACTIVE'|'BLOCKED'|'DEACTIVATED', label }]
+CARD_STATUS_LABELS   // Record<string, string> — display label per status
+CARD_STATUS_VARIANT  // Record<string, 'default'|'secondary'|'destructive'> — badge variant per status
+CARD_LIMITS          // { PERSONAL: 2, BUSINESS_PER_PERSON: 1 }
+```
+
+### Format Utilities (`lib/utils/format.ts`)
+
+```typescript
+maskCardNumber(cardNumber: string): string  // '4111111111111111' → '4111 **** **** 1111'
+formatAccountNumber(accountNumber: string): string  // 18-digit → 'XXX-XXXXXXXXXX-XX'
+formatCurrency(amount: number, currency: string): string
 ```
 
 ### Date Utilities (`lib/utils/dateFormatter.ts`)
@@ -634,12 +667,13 @@ All defined in `lib/utils/validation.ts` using Zod.
 | `activationSchema` | ActivationForm | `{token, password, confirm_password}` — passwords must match |
 | `createEmployeeSchema` | EmployeeCreateForm | All required fields + JMBG 13-digit regex |
 | `updateEmployeeSchema` | EmployeeEditForm | All optional; JMBG `/^\d{13}$/` if provided |
+| `authorizedPersonSchema` | AuthorizedPersonForm | first_name, last_name, date_of_birth (required), gender (optional), email, phone, address |
 
 ---
 
 ## 12. Test Coverage
 
-_Measured: 2026-03-21 — 105 test suites, 437 tests, all passing._
+_Measured: 2026-03-24 — 108 test suites, 462 tests (456 passing, 6 pre-existing timeouts in unrelated tests)._
 
 ### Overall Coverage
 
