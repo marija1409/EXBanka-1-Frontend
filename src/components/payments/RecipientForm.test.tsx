@@ -54,6 +54,14 @@ describe('RecipientForm', () => {
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument()
   })
 
+  it('calls onCancel when Cancel button is clicked', async () => {
+    const user = userEvent.setup()
+    const onCancel = jest.fn()
+    render(<RecipientForm onSubmit={noop} onCancel={onCancel} submitting={false} />)
+    await user.click(screen.getByRole('button', { name: /cancel/i }))
+    expect(onCancel).toHaveBeenCalledTimes(1)
+  })
+
   it('shows "Save" label when in edit mode', () => {
     render(<RecipientForm onSubmit={noop} submitting={false} isEditing />)
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument()
