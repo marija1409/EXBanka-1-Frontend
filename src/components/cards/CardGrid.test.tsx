@@ -10,8 +10,8 @@ describe('CardGrid', () => {
       createMockCard({ id: 2, card_number: '5222222222222222' }),
     ]
     renderWithProviders(<CardGrid cards={cards} onBlock={jest.fn()} />)
-    expect(screen.getByText('4111********1111')).toBeInTheDocument()
-    expect(screen.getByText('5222********2222')).toBeInTheDocument()
+    expect(screen.getByText('4111 **** **** 1111')).toBeInTheDocument()
+    expect(screen.getByText('5222 **** **** 2222')).toBeInTheDocument()
   })
 
   it('shows empty state', () => {

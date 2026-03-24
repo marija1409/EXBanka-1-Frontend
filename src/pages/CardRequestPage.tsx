@@ -28,12 +28,16 @@ export function CardRequestPage() {
   const [step, setStep] = useState<Step>('select')
   const [selectedAccount, setSelectedAccount] = useState('')
   const [selectedBrand, setSelectedBrand] = useState<CardBrand | undefined>()
+  const [error, setError] = useState<string | null>(null)
 
   if (isLoading) return <p>Loading...</p>
+
+  const onMutationError = () => setError('An error occurred. Please try again.')
 
   const handleSelectAccount = (accountNumber: string, cardBrand: CardBrand) => {
     setSelectedAccount(accountNumber)
     setSelectedBrand(cardBrand)
+    setError(null)
     const acc = accounts.find((a) => a.account_number === accountNumber)
     if (acc?.account_category === 'business') {
       setStep('business-choice')
@@ -45,12 +49,13 @@ export function CardRequestPage() {
           owner_type: 'CLIENT',
           card_brand: cardBrand,
         },
-        { onSuccess: () => setStep('verify') }
+        { onSuccess: () => setStep('verify'), onError: onMutationError }
       )
     }
   }
 
   const handleRequestForSelf = () => {
+    setError(null)
     requestCard.mutate(
       {
         account_number: selectedAccount,
@@ -58,11 +63,12 @@ export function CardRequestPage() {
         owner_type: 'CLIENT',
         card_brand: selectedBrand,
       },
-      { onSuccess: () => setStep('verify') }
+      { onSuccess: () => setStep('verify'), onError: onMutationError }
     )
   }
 
   const handleRequestForAP = (data: CreateAuthorizedPersonRequest) => {
+    setError(null)
     const acc = accounts.find((a) => a.account_number === selectedAccount)
     requestForAP.mutate(
       { ...data, account_id: acc?.id ?? 0 },
@@ -75,19 +81,25 @@ export function CardRequestPage() {
               owner_type: 'AUTHORIZED_PERSON',
               card_brand: selectedBrand,
             },
-            { onSuccess: () => setStep('verify') }
+            { onSuccess: () => setStep('verify'), onError: onMutationError }
           )
         },
+        onError: onMutationError,
       }
     )
   }
 
   const handleConfirm = (code: string) => {
+    setError(null)
     confirmCard.mutate(
       { account_number: selectedAccount, code },
-      { onSuccess: () => setStep('success') }
+      { onSuccess: () => setStep('success'), onError: onMutationError }
     )
   }
+
+  const errorBanner = error ? (
+    <p className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</p>
+  ) : null
 
   if (step === 'success') {
     return (
@@ -99,7 +111,12 @@ export function CardRequestPage() {
   }
 
   if (step === 'verify') {
-    return <VerificationCodeInput onSubmit={handleConfirm} loading={confirmCard.isPending} />
+    return (
+      <div className="space-y-4">
+        {errorBanner}
+        <VerificationCodeInput onSubmit={handleConfirm} loading={confirmCard.isPending} />
+      </div>
+    )
   }
 
   if (step === 'authorized-person') {
@@ -108,6 +125,7 @@ export function CardRequestPage() {
         <Button variant="ghost" onClick={() => setStep('business-choice')}>
           ← Back
         </Button>
+        {errorBanner}
         <AuthorizedPersonForm
           onSubmit={handleRequestForAP}
           loading={requestForAP.isPending || requestCard.isPending}
@@ -122,6 +140,7 @@ export function CardRequestPage() {
         <Button variant="ghost" onClick={() => setStep('select')}>
           ← Back
         </Button>
+        {errorBanner}
         <h2 className="text-lg font-semibold">Who do you want a card for?</h2>
         <div className="flex gap-3">
           <Button onClick={handleRequestForSelf} disabled={requestCard.isPending}>
@@ -140,6 +159,7 @@ export function CardRequestPage() {
       <Button variant="ghost" onClick={() => navigate('/cards')}>
         ← Back
       </Button>
+      {errorBanner}
       <CardRequestForm
         accounts={accounts}
         onSubmit={handleSelectAccount}

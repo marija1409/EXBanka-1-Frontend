@@ -5,9 +5,9 @@ import { maskCardNumber, formatAccountNumber } from '@/lib/utils/format'
 import type { Card as CardType } from '@/types/card'
 
 const STATUS_LABELS: Record<string, string> = {
-  ACTIVE: 'Aktivna',
-  BLOCKED: 'Blokirana',
-  DEACTIVATED: 'Deaktivirana',
+  ACTIVE: 'Active',
+  BLOCKED: 'Blocked',
+  DEACTIVATED: 'Deactivated',
 }
 
 const STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'destructive'> = {
@@ -42,7 +42,7 @@ export function CardItem({ card, onBlock, accountName }: CardItemProps) {
           </Badge>
           {card.status === 'ACTIVE' && (
             <Button variant="destructive" size="sm" onClick={() => onBlock(card.id)}>
-              Blokiraj
+              Block
             </Button>
           )}
         </div>
