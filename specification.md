@@ -1,6 +1,6 @@
 # EXBanka Frontend — Project Specification
 
-_Last updated: 2026-03-24_
+_Last updated: 2026-03-24 (updated for tasks 7–9: delete confirmation, SavedRecipientSelect, commission column)_
 
 ---
 
@@ -124,6 +124,20 @@ src/
 │   │   ├── CardRequestForm.tsx + .test.tsx  # Account selector for card request
 │   │   ├── AuthorizedPersonForm.tsx + .test.tsx  # Authorized person form (all fields incl. date_of_birth, gender)
 │   │   └── VerificationCodeInput.tsx + .test.tsx  # SMS/OTP code input for card confirmation
+│   ├── payments/
+│   │   ├── NewPaymentForm.tsx + .test.tsx       # Payment form; "Payment Purpose" label; uses SavedRecipientSelect (~146 lines)
+│   │   ├── SavedRecipientSelect.tsx              # Extracted select for saved recipients (onSelect: string => void)
+│   │   ├── PaymentConfirmation.tsx + .test.tsx  # Confirmation step; props: {formData, currency, onConfirm, onBack, submitting, error}
+│   │   ├── PaymentHistoryTable.tsx + .test.tsx  # Payment history table; PDF button uses e.stopPropagation()
+│   │   ├── RecipientForm.tsx + .test.tsx        # Props: {onSubmit, onCancel?, submitting, isEditing?, defaultValues?}; button label: "Save"/"Add"
+│   │   ├── RecipientList.tsx                    # Table of recipients with Edit/Delete buttons
+│   │   └── AddRecipientPrompt.tsx               # Prompt to save new recipient after payment success
+│   ├── transfers/
+│   │   ├── CreateTransferForm.tsx + .test.tsx   # Transfer form; same-currency transfers allowed
+│   │   ├── TransferPreview.tsx                  # Confirmation/preview step for transfers
+│   │   └── TransferHistoryTable.tsx + .test.tsx # Transfer history; columns: Date, From, To, Amount, Final, Rate, Commission
+│   ├── verification/
+│   │   └── VerificationStep.tsx + .test.tsx     # OTP/SMS verification step (used by payments and transfers)
 │   ├── admin/
 │   │   ├── AdminCardItem.tsx + .test.tsx  # Admin card tile using CardVisual + block/unblock/deactivate buttons
 │   │   ├── AccountTable.tsx + .test.tsx   # Admin account list table
@@ -673,7 +687,7 @@ All defined in `lib/utils/validation.ts` using Zod.
 
 ## 12. Test Coverage
 
-_Measured: 2026-03-24 — 108 test suites, 462 tests (456 passing, 6 pre-existing timeouts in unrelated tests)._
+_Measured: 2026-03-24 — 108 test suites, 475 tests (all passing)._
 
 ### Overall Coverage
 
