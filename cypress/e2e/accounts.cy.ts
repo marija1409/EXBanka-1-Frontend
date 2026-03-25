@@ -19,7 +19,7 @@ describe('Celina 1: Računi — Kreiranje i upravljanje računima', () => {
       cy.contains('li', 'Marko Jovanović').should('be.visible').click()
 
       // Account Type is "current" by default — verify
-      cy.get('[aria-label="Account Type"]').should('contain.text', 'Current')
+      cy.get('[aria-label="Account Type"]').should('contain.text', 'current')
 
       // Enter initial balance
       cy.get('#initial_balance').clear().type('10000')
