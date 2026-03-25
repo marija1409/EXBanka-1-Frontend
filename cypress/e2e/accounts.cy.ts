@@ -119,13 +119,13 @@ describe('Celina 1: Računi — Kreiranje i upravljanje računima', () => {
 
   describe('Client: Account Viewing & Management (Scenarios 6–8)', () => {
     beforeEach(() => {
-      cy.intercept('GET', '/api/accounts/client/*', { fixture: 'accounts.json' }).as(
+      cy.intercept('GET', '/api/me/accounts', { fixture: 'accounts.json' }).as(
         'getClientAccounts'
       )
-      cy.intercept('GET', '/api/payments/account/*', {
+      cy.intercept('GET', '/api/me/payments*', {
         body: { payments: [], total: 0 },
       }).as('getPayments')
-      cy.intercept('GET', '/api/clients/me', {
+      cy.intercept('GET', '/api/me', {
         body: { id: 42, first_name: 'Marko', last_name: 'Jovanović', email: 'marko@example.com' },
       }).as('getClientMe')
       cy.loginAsClient('/accounts')
