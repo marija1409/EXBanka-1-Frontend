@@ -52,10 +52,12 @@ describe('Celina 1: Računi — Kreiranje i upravljanje računima', () => {
       cy.contains('button', 'Create Account').click()
       cy.wait('@createAccount')
 
-      cy.get('@createAccount').its('request.body').should((body) => {
-        expect(body.account_kind).to.equal('foreign')
-        expect(body.currency_code).to.equal('EUR')
-      })
+      cy.get('@createAccount')
+        .its('request.body')
+        .should((body) => {
+          expect(body.account_kind).to.equal('foreign')
+          expect(body.currency_code).to.equal('EUR')
+        })
 
       cy.url().should('include', '/admin/accounts')
     })
@@ -76,9 +78,9 @@ describe('Celina 1: Računi — Kreiranje i upravljanje računima', () => {
       cy.contains('button', 'Create Account').click()
       cy.wait('@createAccount')
 
-      cy.get('@createAccount').its('request.body').should((body) => {
-        expect(body.create_card).to.be.true
-        expect(body.card_brand).to.equal('visa')
+      cy.get('@createAccount').its('request.body').should('include', {
+        create_card: true,
+        card_brand: 'visa',
       })
 
       cy.url().should('include', '/admin/accounts')
@@ -104,9 +106,11 @@ describe('Celina 1: Računi — Kreiranje i upravljanje računima', () => {
       cy.contains('button', 'Create Account').click()
       cy.wait('@createAccount')
 
-      cy.get('@createAccount').its('request.body').should((body) => {
-        expect(body.account_category).to.equal('business')
-      })
+      cy.get('@createAccount')
+        .its('request.body')
+        .should((body) => {
+          expect(body.account_category).to.equal('business')
+        })
 
       cy.url().should('include', '/admin/accounts')
     })
