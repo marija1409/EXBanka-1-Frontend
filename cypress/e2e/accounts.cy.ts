@@ -43,11 +43,11 @@ describe('Celina 1: Računi — Kreiranje i upravljanje računima', () => {
 
       // Select foreign account type
       cy.get('[aria-label="Account Type"]').click()
-      cy.contains('[role="option"]', 'Foreign').click()
+      cy.contains('[role="option"]', 'Foreign').click({ force: true })
 
-      // Currency selector appears — select EUR
-      cy.get('[aria-label="Currency"]').click()
-      cy.contains('[role="option"]', 'EUR').click()
+      // Currency selector appears — wait for it then select EUR
+      cy.get('[aria-label="Currency"]').should('be.visible').click()
+      cy.contains('[role="option"]', 'EUR').click({ force: true })
 
       cy.contains('button', 'Create Account').click()
       cy.wait('@createAccount')
@@ -73,9 +73,10 @@ describe('Celina 1: Računi — Kreiranje i upravljanje računima', () => {
 
       // Select card brand
       cy.get('[aria-label="Card Brand"]').click()
-      cy.contains('[role="option"]', 'Visa').click()
+      cy.contains('[role="option"]', 'Visa').click({ force: true })
+      cy.get('[aria-label="Card Brand"]').should('contain.text', 'visa')
 
-      cy.contains('button', 'Create Account').click()
+      cy.contains('button', 'Create Account').click({ force: true })
       cy.wait('@createAccount')
 
       cy.get('@createAccount').its('request.body').should('include', {
@@ -94,10 +95,10 @@ describe('Celina 1: Računi — Kreiranje i upravljanje računima', () => {
 
       // Select business category
       cy.get('[aria-label="Account Category"]').click()
-      cy.contains('[role="option"]', 'Company').click()
+      cy.contains('[role="option"]', 'Company').click({ force: true })
 
-      // Fill company fields (dots in IDs must be escaped in CSS selectors)
-      cy.get('#company\\.name').type('Tech DOO')
+      // Fill company fields — wait for CompanyForm to render first
+      cy.get('#company\\.name').should('be.visible').type('Tech DOO')
       cy.get('#company\\.tax_number').type('123456789')
       cy.get('#company\\.registration_number').type('12345678')
       cy.get('#company\\.activity_code').type('6201')
