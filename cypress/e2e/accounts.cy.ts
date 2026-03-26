@@ -142,7 +142,7 @@ describe('Celina 1: Računi — Kreiranje i upravljanje računima', () => {
 
     // Scenario 7: Pregled detalja računa
     it('should display account details when account card is clicked', () => {
-      cy.intercept('GET', '/api/accounts/1', { fixture: 'account-detail.json' }).as(
+      cy.intercept('GET', '/api/me/accounts/1', { fixture: 'account-detail.json' }).as(
         'getAccountDetail'
       )
 
@@ -159,7 +159,7 @@ describe('Celina 1: Računi — Kreiranje i upravljanje računima', () => {
 
     // Scenario 8: Promena naziva računa
     it('should rename an account successfully', () => {
-      cy.intercept('GET', '/api/accounts/1', { fixture: 'account-detail.json' }).as(
+      cy.intercept('GET', '/api/me/accounts/1', { fixture: 'account-detail.json' }).as(
         'getAccountDetail'
       )
       cy.fixture('account-detail.json').then((account) => {
